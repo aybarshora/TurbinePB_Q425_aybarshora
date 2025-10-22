@@ -23,11 +23,22 @@ impl Counter {
         Ok(())
     }
 
+     //Decrement the value
+     pub fn dec(&mut self) -> Result<(), &'static str> {
+        if self.value <= 0 {
+            return Err("cap reached");
+        }
+        self.value -= 1;
+        Ok(())
+    }
+
+
     //Reset the value
     pub fn reset(&mut self) {
         self.value = 0;
     }
 }
+
 
 fn main(){  
     let mut counter = Counter::new(1);
@@ -44,6 +55,15 @@ fn main(){
 
     println!("Counter value after increment: {}", counter.value());
 
+    //Let's decrement the counter.
+    match counter.dec() {
+        Ok(()) => println!("Decremented successfully!"),
+        Err(e) => println!("Error: {}", e),
+    }
+
+    println!("Counter value after decrement: {}", counter.value());
+
+    //Reset the counter.
     counter.reset();
 
     println!("Counter value after reset: {}", counter.value());
