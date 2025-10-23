@@ -1,3 +1,5 @@
+use std::io;
+
 pub struct Counter {
     value: u64,
     max: u64,
@@ -9,31 +11,30 @@ impl Counter {
         Self { value: 0, max }
     }
 
-    //Read the value
-    pub fn value(&self) -> u64 {
+    pub fn current_value(&self) -> u64 {
         self.value
     }
 
-    //Increment the value
-    pub fn inc(&mut self) -> Result<(), &'static str> {
+    pub fn max_value(&self) -> u64 {
+        self.max
+    }
+
+    pub fn inc(&mut self) -> Result<(), &str> {
         if self.value >= self.max {
-            return Err("cap reached");
+            return Err("Max cap reached");
         }
         self.value += 1;
         Ok(())
     }
 
-     //Decrement the value
      pub fn dec(&mut self) -> Result<(), &'static str> {
         if self.value <= 0 {
-            return Err("cap reached");
+            return Err("Min cap reached");
         }
         self.value -= 1;
         Ok(())
     }
 
-
-    //Reset the value
     pub fn reset(&mut self) {
         self.value = 0;
     }
@@ -41,30 +42,65 @@ impl Counter {
 
 
 fn main(){  
-    let mut counter = Counter::new(1);
+    let mut counter = Counter::new(5);
+
+    println!("\n Counter created with the max value {}", counter.max_value());
+
+    //We show menu default once at the beggining so it doesn't fill the whole CLI 
+    let menu = "\n=== CLI Counter App Menu ===
+    1. View Count
+    2. Increment Counter
+    3. Decrement Counter
+    4. Reset Counter
+    5. Exit 
+    6. Show Menu
+    ==============================";
     
-    let count_value = counter.value();
+    println!("{}", menu);
 
-    println!("Initial counter value: {}", count_value);
+    loop{
+        println!("6 to open menu");
 
-    //Let's increment the counter.
-    match counter.inc() {
-        Ok(()) => println!("Incremented successfully!"),
-        Err(e) => println!("Error: {}", e),
+        println!("Please enter your choice: ");
+
+        let mut user_choice = String::new();
+        
+        //Read from the std input
+        io::stdin()
+        .read_line(&mut user_choice)
+        .expect("Failed to read line"); 
+
+        //Converting String to u32
+        let user_choice: u32 = match user_choice.trim().parse(){
+            Ok(num) => num,
+            Err(_) => {
+                println!("Please enter a valid number!");
+                continue;
+            }
+        };
+        
+        match user_choice {
+           1 => println!("Current counter value: {}", counter.current_value()),
+           2 => match counter.inc() {
+            Ok(()) => println!("Counter Incremented!"),
+            Err(e) => println!("Error: {}", e),
+           }
+           3 => match counter.dec() {
+            Ok(()) => println!("Counter Decremented!"),
+            Err(e) => println!("Error: {}", e),
+           }
+           4 => { 
+            println!("Counter reset");
+            counter.reset();
+           }
+           5 => {
+            println!("Exiting. Final count: {}", counter.current_value());
+            break;
+           }
+           6 => println!("{}", menu),
+           _ => {
+            println!("Invalid input. Please enter a number from 1 to 5.");
+           }      
+        }
     }
-
-    println!("Counter value after increment: {}", counter.value());
-
-    //Let's decrement the counter.
-    match counter.dec() {
-        Ok(()) => println!("Decremented successfully!"),
-        Err(e) => println!("Error: {}", e),
-    }
-
-    println!("Counter value after decrement: {}", counter.value());
-
-    //Reset the counter.
-    counter.reset();
-
-    println!("Counter value after reset: {}", counter.value());
 }
