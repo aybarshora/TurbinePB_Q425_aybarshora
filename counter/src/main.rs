@@ -27,7 +27,7 @@ impl Counter {
         Ok(())
     }
 
-     pub fn dec(&mut self) -> Result<(), &'static str> {
+     pub fn dec(&mut self) -> Result<(), &str> {
         if self.value <= 0 {
             return Err("Min cap reached");
         }
